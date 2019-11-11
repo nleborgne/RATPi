@@ -34,8 +34,8 @@ def getTraffic(train,line):
         train1 = 'rers'
     elif(train.lower() == 'metro' or train.lower() == 'métro'):
         train1 = 'metros'
-    
-    url = ('https://api-ratp.pierre-grimaud.fr/v3/traffic/{}/{}'.format(train1.lower(),line.lower()))
+
+    url = ('https://api-ratp.pierre-grimaud.fr/v4/traffic/{}/{}'.format(train1.lower(),line.lower()))
     resp = requests.get(url=url)
     title = resp.json()['result']['title']
     message = resp.json()['result']['message']
@@ -51,6 +51,9 @@ class BotStreamer(tweepy.StreamListener):
         string = status.text.split()
         try :
             traffic = getTraffic(string[1],string[2])
+            if(len(traffic) >= 280):
+                traffic = traffic[0:270]+'...'
+
             api.update_status(status='@{} {}'.format(username,traffic),in_reply_to_status_id=status.id)
         except Exception as e:
             logging.warning(e)
